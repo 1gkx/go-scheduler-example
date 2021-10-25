@@ -38,6 +38,7 @@ func (s *Scheduler) Stop() {
 
 func (s *Scheduler) process(ctx context.Context, j job.Task) {
 	ticker := time.NewTicker(j.Interval)
+	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
