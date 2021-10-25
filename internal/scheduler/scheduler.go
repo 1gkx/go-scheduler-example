@@ -1,9 +1,11 @@
-package main
+package scheduler
 
 import (
 	"context"
 	"sync"
 	"time"
+
+	"scheduler/internal/job"
 )
 
 type Scheduler struct {
@@ -20,7 +22,7 @@ func NewScheduler() *Scheduler {
 
 func (s *Scheduler) Add(
 	ctx context.Context,
-	j Job,
+	j job.Job,
 	interval time.Duration,
 ) {
 	ctx, cancel := context.WithCancel(ctx)
@@ -38,7 +40,7 @@ func (s *Scheduler) Stop() {
 
 func (s *Scheduler) process(
 	ctx context.Context,
-	j Job,
+	j job.Job,
 	interval time.Duration,
 ) {
 	ticker := time.NewTicker(interval)

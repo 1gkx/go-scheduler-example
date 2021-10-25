@@ -1,42 +1,20 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"log"
 	"os"
-	"os/signal"
-	"time"
+
+	"github.com/urfave/cli"
+	"scheduler/internal/cmd"
 )
 
-type Job func(ctx context.Context)
-
 func main() {
-
-	ctx := context.Background()
-
-	worker := NewScheduler()
-	worker.Add(ctx, parseSubscriptionData, time.Second*5)
-	worker.Add(ctx, sendStatistics, time.Second*10)
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, os.Interrupt)
-
-	<-quit
-	worker.Stop()
-}
-
-func parseSubscriptionData(ctx context.Context) {
-	time.Sleep(time.Second * 1)
-	fmt.Printf(
-		"Subscription parsed successfuly at %s\n",
-		time.Now().String(),
-	)
-}
-
-func sendStatistics(ctx context.Context) {
-	time.Sleep(time.Second*5)
-	fmt.Printf(
-		"Statistics send at %s\n",
-		time.Now().String(),
-	)
+	app := cli.NewApp()
+	app.Name = "scheduler"
+	app.Usage = "Example project"
+	app.Version = "0.0.1"
+	app.Commands = []cli.Command{cmd.Run}
+	if err := app.Run(os.Args); err != nil {
+		log.Fatalf("Failed to start application: %v", err)
+	}
 }
