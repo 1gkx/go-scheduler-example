@@ -21,12 +21,20 @@ func NewScheduler() *Scheduler {
 	}
 }
 
-func (s *Scheduler) Add(ctx context.Context, j job.Task) {
-	c, cancel := context.WithCancel(ctx)
-	j.Cancel = cancel
-	s.tasks[j.Id] = &j
+func (s *Scheduler) addTask(j *job.Task) {
+	s.tasks[j.Id] = j
 	s.wg.Add(1)
-	go s.process(c, j)
+}
+
+func (s *Scheduler) deleteTask(j *job.Task) {
+	j.Cancel()
+	delete(s.tasks, j.Id)
+}
+
+func (s *Scheduler) Add(ctx context.Context, j job.Task) {
+	ctx, j.Cancel = context.WithCancel(ctx)
+	s.addTask(&j)
+	go s.process(ctx, &j)
 }
 
 func (s *Scheduler) Stop() {
@@ -36,16 +44,15 @@ func (s *Scheduler) Stop() {
 	s.wg.Wait()
 }
 
-func (s *Scheduler) process(ctx context.Context, j job.Task) {
+func (s *Scheduler) process(ctx context.Context, j *job.Task) {
 	ticker := time.NewTicker(j.Interval)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			j.Fn(ctx)
+			j.Invoke(ctx, j)
 			if !j.Repeatable {
-				j.Cancel()
-				delete(s.tasks, j.Id)
+				s.deleteTask(j)
 			}
 		case <-ctx.Done():
 			s.wg.Done()

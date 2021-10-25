@@ -22,8 +22,8 @@ func run(c *cli.Context) {
 	ctx := context.Background()
 
 	worker := scheduler.NewScheduler()
-	task1 := job.Task{ Id: 1, Interval: time.Second*2, Repeatable: true, Fn: job.ParseSubscriptionData}
-	task2 := job.Task{ Id: 2, Interval: time.Second*5, Repeatable: false, Fn: job.SendStatistics}
+	task1 := job.Task{ Id: 1, Name: "task-1", Interval: time.Second*2, Repeatable: true, Fn: job.Greeting}
+	task2 := job.Task{ Id: 2, Name: "task-2", Interval: time.Second*5, Repeatable: false, Fn: job.Greeting}
 
 	worker.Add(ctx, task1)
 	worker.Add(ctx, task2)

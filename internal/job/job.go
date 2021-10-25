@@ -6,16 +6,29 @@ import (
 	"time"
 )
 
+type TaskInterface interface {
+	Invoke(ctx context.Context)
+}
+
 type Task struct {
 	Id int
+	Name string
+	Params string
 	Interval time.Duration
 	Repeatable bool
-	Fn func(ctx context.Context)
+	Fn func(ctx context.Context, t *Task)
 	Cancel context.CancelFunc
 }
 
+func (ts *Task) Invoke(ctx context.Context, t *Task) {
+	ts.Fn(ctx, t)
+}
+
+func Greeting(ctx context.Context, t *Task) {
+	fmt.Printf("I`m task %s with id %d\n", t.Name, t.Id)
+}
+
 func ParseSubscriptionData(ctx context.Context) {
-	time.Sleep(time.Second * 1)
 	fmt.Printf(
 		"Subscription parsed successfuly at %s\n",
 		time.Now().String(),
@@ -23,7 +36,6 @@ func ParseSubscriptionData(ctx context.Context) {
 }
 
 func SendStatistics(ctx context.Context) {
-	time.Sleep(time.Second*3)
 	fmt.Printf(
 		"Statistics send at %s\n",
 		time.Now().String(),
