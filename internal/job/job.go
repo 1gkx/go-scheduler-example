@@ -16,8 +16,8 @@ type Task struct {
 	Params string `json:"params,omitempty"`
 	Interval string `json:"interval,omitempty"`
 	Repeatable bool `json:"repeatable,omitempty"`
-	Fn func(ctx context.Context, t *Task)
-	Cancel context.CancelFunc
+	Fn func(ctx context.Context, t *Task) `json:"-"`
+	Cancel context.CancelFunc `json:"-"`
 }
 
 func (ts *Task) Invoke(ctx context.Context, t *Task) {

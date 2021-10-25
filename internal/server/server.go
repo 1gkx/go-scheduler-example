@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"scheduler/internal/job"
 	"scheduler/internal/scheduler"
+	"time"
 )
 
 type Srv struct {
@@ -41,12 +42,14 @@ func addTask (ctx context.Context, s *scheduler.Scheduler) http.HandlerFunc {
 			return
 		}
 		t.Fn = job.Greeting
-
-		fmt.Printf("Task: %+v\n", t)
 		s.Add(ctx, t)
-
+		data, err := json.Marshal(t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Ok"))
+		w.Write(data)
 	}
 }
 
@@ -58,5 +61,6 @@ func (s *Srv) Serve() {
 }
 
 func (s *Srv) Shutdown() {
+	fmt.Printf("Server stop at %s\n", time.Now().String())
 	s.s.Stop()
 }
