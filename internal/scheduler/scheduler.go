@@ -45,7 +45,11 @@ func (s *Scheduler) Stop() {
 }
 
 func (s *Scheduler) process(ctx context.Context, j *job.Task) {
-	ticker := time.NewTicker(j.Interval)
+	interval, err := j.GetInterval()
+	if err != nil {
+		panic(err)
+	}
+	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for {
 		select {

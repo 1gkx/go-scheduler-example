@@ -11,17 +11,21 @@ type TaskInterface interface {
 }
 
 type Task struct {
-	Id int
-	Name string
-	Params string
-	Interval time.Duration
-	Repeatable bool
+	Id int `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+	Params string `json:"params,omitempty"`
+	Interval string `json:"interval,omitempty"`
+	Repeatable bool `json:"repeatable,omitempty"`
 	Fn func(ctx context.Context, t *Task)
 	Cancel context.CancelFunc
 }
 
 func (ts *Task) Invoke(ctx context.Context, t *Task) {
 	ts.Fn(ctx, t)
+}
+
+func (ts *Task) GetInterval() (time.Duration, error) {
+	return time.ParseDuration(ts.Interval)
 }
 
 func Greeting(ctx context.Context, t *Task) {
