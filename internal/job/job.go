@@ -6,7 +6,13 @@ import (
 	"time"
 )
 
-type Job func(ctx context.Context)
+type Task struct {
+	Id int
+	Interval time.Duration
+	Repeatable bool
+	Fn func(ctx context.Context)
+	Cancel context.CancelFunc
+}
 
 func ParseSubscriptionData(ctx context.Context) {
 	time.Sleep(time.Second * 1)
@@ -17,7 +23,7 @@ func ParseSubscriptionData(ctx context.Context) {
 }
 
 func SendStatistics(ctx context.Context) {
-	time.Sleep(time.Second*5)
+	time.Sleep(time.Second*3)
 	fmt.Printf(
 		"Statistics send at %s\n",
 		time.Now().String(),

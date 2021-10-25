@@ -22,8 +22,11 @@ func run(c *cli.Context) {
 	ctx := context.Background()
 
 	worker := scheduler.NewScheduler()
-	worker.Add(ctx, job.ParseSubscriptionData, time.Second*5)
-	worker.Add(ctx, job.SendStatistics, time.Second*10)
+	task1 := job.Task{ Id: 1, Interval: time.Second*2, Repeatable: true, Fn: job.ParseSubscriptionData}
+	task2 := job.Task{ Id: 2, Interval: time.Second*5, Repeatable: false, Fn: job.SendStatistics}
+
+	worker.Add(ctx, task1)
+	worker.Add(ctx, task2)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, os.Interrupt)
